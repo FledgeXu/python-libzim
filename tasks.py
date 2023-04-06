@@ -22,7 +22,10 @@ from invoke import task
 def download_libzim(c, version="8.1.0"):
     """download C++ libzim binary"""
 
-    if platform.machine() != "x86_64" or platform.system() not in ("Linux", "Darwin"):
+    arch = platform.machine()
+    if not (
+        arch == "x86_64" or arch == "arm64" or arch == "aarch64" or arch == "armhf"
+    ) or platform.system() not in ("Linux", "Darwin"):
         raise NotImplementedError(f"Platform {platform.platform()} not supported")
 
     is_nightly = re.match(r"^\d{4}-\d{2}-\d{2}$", version)
@@ -34,8 +37,9 @@ def download_libzim(c, version="8.1.0"):
         )
 
     fname = pathlib.Path(
-        "libzim_{os}-x86_64-{version}.tar.gz".format(
+        "libzim_{os}-{arch}-{version}.tar.gz".format(
             os={"Linux": "linux", "Darwin": "macos"}.get(platform.system()),
+            platform=arch,
             version=version,
         )
     )
